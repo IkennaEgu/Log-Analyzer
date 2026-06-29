@@ -1,0 +1,46 @@
+
+#!/bin/python3
+#Declared kernel
+
+import os
+#imported the os module for specific code functionalities
+
+#created multiple functions to perform bulk of the work by implementing using the .system() function of the os module 
+#an awk command to search for a specified pattern in the place holder 'log_file' and print out specific columns of the file that are needed
+
+#This function extracts the timestamp and names of newly added users recorded by the auth.log file
+def new_users(log_file):
+    os.system(f"awk '/useradd/ {{print $1, $4, $5, $6}}' {log_file}")
+
+#This function extracts the timestamp and names of deleted users recorded by the auth.log file
+def deleted_users(log_file):
+    os.system(f"awk '/delete user/ {{print $1, $4, $5, $6, $7}}' {log_file}")
+
+#This function extracts the timestamp and password changes for users recorded by the auth.log file
+def password_changes(log_file):
+    os.system(f"awk '/password changed/ {{print $1, $5, $6, $7, $8}}' {log_file}")
+
+#This function extracts the names of users that were switched to, recorded by the auth.log file
+def su_commands(log_file):
+    os.system(f"awk '/su:session/ {{print $3, $5, $6, $7, $8, $9}}' {log_file}")
+
+#This function extracts the names of users who used sudo and the commands used ,recorded by the auth.log file
+def sudo_usage(log_file):
+    os.system(f"awk '/sudo:/ && /USER/ && /COMMAND/ {{print $3, $10, $12, $13}}' {log_file}")
+
+#This function extracts the details of failed sudo attempts recorded by the auth.log file
+def failed_sudo(log_file):
+    os.system(f"awk '/sudo:/ && /NOT in sudoers/ {{print \"ALERT!\", $7, $8, $9, $10, $17}}' {log_file}")
+
+path='/var/log/auth.log'
+#declared the path variable and assigned to it a string value representing the path to my linux os auth.log file in the log directory
+
+print("Newly added users:")
+#i called the new_users function 
+new_users(path)
+
+print("\nDeleted users:")
+#i called the deleted_users function 
+deleted_users(path)
+
+print("\nPassword changes:")
